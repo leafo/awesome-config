@@ -1,3 +1,4 @@
+-- vim: shiftwidth=4:tabstop=4:softtabstop=4:expandtab
 -- Standard awesome library
 require("awful")
 require("awful.autofocus")
@@ -30,6 +31,7 @@ moon.debug.upvalue(beautiful.init, "dofile", function(path)
 	local theme = dofile(path)
 	if theme then
 		theme.wallpaper_cmd = nil
+		theme.font = "terminus 8"
 	end
 	return theme
 end)
@@ -47,19 +49,20 @@ editor_cmd = terminal .. " -e " .. editor
 -- I suggest you to remap Mod4 to another key using xmodmap or other tools.
 -- However, you can use another modifier like Mod1, but it may interact with others.
 modkey = "Mod1"
+other_modkey = "Mod4"
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 layouts =
 {
     awful.layout.suit.tile,
     -- awful.layout.suit.tile.left,
-    awful.layout.suit.tile.bottom,
+    -- awful.layout.suit.tile.bottom,
     -- awful.layout.suit.tile.top,
     -- awful.layout.suit.fair,
     -- awful.layout.suit.fair.horizontal,
     -- awful.layout.suit.spiral,
     -- awful.layout.suit.spiral.dwindle,
-    -- awful.layout.suit.max,
+    awful.layout.suit.max,
     -- awful.layout.suit.max.fullscreen,
     awful.layout.suit.floating,
     awful.layout.suit.magnifier
@@ -222,7 +225,22 @@ globalkeys = awful.util.table.join(
             awful.client.focus.byidx(-1)
             if client.focus then client.focus:raise() end
         end),
+
     awful.key({ modkey,           }, "w", function () mymainmenu:show({keygrabber=true}) end),
+
+    -- music stuff
+    awful.key({ modkey, "Shift" }, "Left", function()
+		awful.util.spawn("mpc toggle")
+	end),
+
+    awful.key({ modkey }, "Up", function()
+		awful.util.spawn("amixer set Master 5%+")
+	end),
+
+    awful.key({ modkey }, "Down", function()
+		awful.util.spawn("amixer set Master 5%-")
+	end),
+
 
     -- Layout manipulation
     awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end),
@@ -255,7 +273,14 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Control" }, "n", awful.client.restore),
 
     -- Prompt
-    awful.key({ modkey },            "r",     function () mypromptbox[mouse.screen]:run() end),
+    -- awful.key({ modkey },            "r",     function () mypromptbox[mouse.screen]:run() end),
+
+    awful.key({ modkey }, "r", function ()
+        awful.util.spawn("dmenu_run -i -p 'Run command:' -nb '" ..
+            beautiful.bg_normal .. "' -nf '" .. beautiful.fg_normal ..
+            "' -sb '" .. beautiful.bg_focus ..
+            "' -sf '" .. beautiful.fg_focus .. "'")
+    end),
 
     awful.key({ modkey }, "x",
               function ()
