@@ -3,11 +3,34 @@
 require("awful")
 require("awful.autofocus")
 require("awful.rules")
-require("awful.remote")
 -- Theme handling library
 require("beautiful")
 -- Notification library
 require("naughty")
+
+-- {{{ Error handling
+-- Check if awesome encountered an error during startup and fell back to
+-- another config (This code will only ever execute for the fallback config)
+if awesome.startup_errors then
+    naughty.notify({ preset = naughty.config.presets.critical,
+                     title = "Oops, there were errors during startup!",
+                     text = awesome.startup_errors })
+end
+
+-- Handle runtime errors after startup
+do
+    local in_error = false
+    awesome.add_signal("debug::error", function (err)
+        -- Make sure we don't go into an endless error loop
+        if in_error then return end
+        in_error = true
+
+        naughty.notify({ preset = naughty.config.presets.critical,
+                         title = "Oops, an error happened!",
+                         text = err })
+        in_error = false
+    end)
+end
 
 -- {{{ Variable definitions
 -- Themes define colours, icons, and wallpapers
@@ -26,17 +49,18 @@ local function print(...)
 end
 
 
-require "moon"
-moon.debug.upvalue(beautiful.init, "dofile", function(path)
-	local theme = dofile(path)
-	if theme then
-		theme.wallpaper_cmd = nil
-		theme.font = "terminus 8"
-	end
-	return theme
-end)
+-- require "moon"
+-- moon.debug.upvalue(beautiful.init, "dofile", function(path)
+-- 	local theme = dofile(path)
+-- 	if theme then
+-- 		theme.wallpaper_cmd = nil
+-- 		theme.font = "terminus 8"
+-- 	end
+-- 	return theme
+-- end)
 
-beautiful.init("/usr/share/awesome/themes/niceandclean/theme.lua")
+-- beautiful.init("/usr/share/awesome/themes/niceandclean/theme.lua")
+beautiful.init("/home/leafo/.config/awesome/themes/niceandclean/theme.lua")
 
 -- This is used later as the default terminal and editor to run.
 terminal = "urxvt"
@@ -47,6 +71,27 @@ editor_cmd = terminal .. " -e " .. editor
 -- Usually, Mod4 is the key with a logo between Control and Alt.
 -- If you do not like this or do not have such a key,
 -- I suggest you to remap Mod4 to another key using xmodmap or other tools.
+local function notify(msg)
+	awful.util.spawn("notify-send " .. ("%q"):format(msg))
+end
+
+local function print(...)
+	local flat = {}
+	for _, arg in ipairs{...} do
+		table.insert(flat, tostring(arg))
+	end
+
+	notify(table.concat(flat, "\t"))
+end
+
+
+-- require "moon"
+-- moon.debug.upvalue(beautiful.init, "dofile", function(path)
+-- 	local theme = dofile(path)
+-- 	if theme then
+-- 		theme.wallpaper_cmd = nil
+-- 		theme.font = "terminus 8"
+
 -- However, you can use another modifier like Mod1, but it may interact with others.
 
 modkey = "Mod4"
