@@ -78,7 +78,7 @@ theme.border_focus  = "#ce2c51"
 theme.taglist_squares_sel = themedir .. "/taglist/squarefw.png"
 theme.taglist_squares_unsel = themedir .. "/taglist/squarew.png"
 
-theme.tasklist_floating_icon = themedir .. "/tasklist/floatingw_grey.png"
+theme.tasklist_floating_icon = themedir .. "/tasklist/floating_pink.png"
 
 -- Variables set for theming the menu:
 -- menu_[bg|fg]_[normal|focus]
