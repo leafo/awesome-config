@@ -1,6 +1,8 @@
 #!/bin/bash
 #
 
+sh ~/.fehbg
+
 # THEMEDIR="/home/demian/.config/awesome/themes/niceandclean"
 # 
 # case "$1" in

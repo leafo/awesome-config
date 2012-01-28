@@ -48,17 +48,6 @@ local function print(...)
 	notify(table.concat(flat, "\t"))
 end
 
-
--- require "moon"
--- moon.debug.upvalue(beautiful.init, "dofile", function(path)
--- 	local theme = dofile(path)
--- 	if theme then
--- 		theme.wallpaper_cmd = nil
--- 		theme.font = "terminus 8"
--- 	end
--- 	return theme
--- end)
-
 -- beautiful.init("/usr/share/awesome/themes/niceandclean/theme.lua")
 beautiful.init("/home/leafo/.config/awesome/themes/niceandclean/theme.lua")
 
@@ -83,14 +72,6 @@ local function print(...)
 
 	notify(table.concat(flat, "\t"))
 end
-
-
--- require "moon"
--- moon.debug.upvalue(beautiful.init, "dofile", function(path)
--- 	local theme = dofile(path)
--- 	if theme then
--- 		theme.wallpaper_cmd = nil
--- 		theme.font = "terminus 8"
 
 -- However, you can use another modifier like Mod1, but it may interact with others.
 
