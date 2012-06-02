@@ -8,6 +8,8 @@ require("beautiful")
 -- Notification library
 require("naughty")
 
+naughty.config.default_preset.font = "Terminus 20"
+
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
 -- another config (This code will only ever execute for the fallback config)
@@ -82,6 +84,9 @@ other_modkey = "Mod1"
 if os.getenv("LAPTOP") then
     modkey, other_modkey = other_modkey, modkey
 end
+
+os.execute"setxkbmap -option ctrl:nocaps"
+os.execute"selfspy.py -c ~/.selfspy.conf"
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 layouts =
