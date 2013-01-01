@@ -86,7 +86,7 @@ if os.getenv("LAPTOP") then
 end
 
 os.execute"setxkbmap -option ctrl:nocaps"
-os.execute"selfspy.py -c ~/.selfspy.conf"
+os.execute"/home/leafo/bin/selfspy.py -c /home/leafo/.selfspy.conf"
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 layouts =
@@ -337,9 +337,11 @@ clientkeys = awful.util.table.join(
         if awful.client.floating.get(c) then
             awful.client.floating.set(c, false)
             c.ontop = false
+            c.sticky = false
         else
             awful.client.floating.set(c, true)
             c.ontop = true
+            c.sticky = true
         end
     end),
     awful.key({ modkey,           }, "f",      function (c) c.fullscreen = not c.fullscreen  end),
