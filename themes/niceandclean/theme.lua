@@ -1,7 +1,7 @@
 -- niceandclean, awesome3 theme, by Blazeix, based off of ghost1227's openbox theme.
 
 --{{{ Main
-require("awful.util")
+local awful = require("awful")
 
 theme = {}
 
@@ -20,26 +20,30 @@ if not awful.util.file_readable(themes .. themename .. "/theme.lua") then
 end
 themedir = themes .. themename
 
-wallpaper1    = themedir .. "/background.jpg"
-wallpaper2    = themedir .. "/background.png"
-wallpaper3    = sharedthemes .. "/zenburn/zenburn-background.png"
-wallpaper4    = sharedthemes .. "/default/background.png"
-wpscript      = home .. "/.wallpaper"
-wpscript2     = themedir .. "/niceandclean.sh"
+theme.wallpaper = themedir .. "/wallpaper.gif"
+theme.wallpaper_type = "tiled"
+-- theme.wallpaper_args = {}
 
-if awful.util.file_readable(wpscript2) then
-	theme.wallpaper_cmd = { "sh " .. wpscript2 }
-elseif awful.util.file_readable(wallpaper1) then
-	theme.wallpaper_cmd = { "awsetbg " .. wallpaper1 }
-elseif awful.util.file_readable(wallpaper2) then
-	theme.wallpaper_cmd = { "awsetbg " .. wallpaper2 }
-elseif awful.util.file_readable(wpscript) then
-	theme.wallpaper_cmd = { "sh " .. wpscript }
-elseif awful.util.file_readable(wallpaper3) then
-	theme.wallpaper_cmd = { "awsetbg " .. wallpaper3 }
-else
-	theme.wallpaper_cmd = { "awsetbg " .. wallpaper4 }
-end
+-- wallpaper1    = themedir .. "/background.jpg"
+-- wallpaper2    = themedir .. "/background.png"
+-- wallpaper3    = sharedthemes .. "/zenburn/zenburn-background.png"
+-- wallpaper4    = sharedthemes .. "/default/background.png"
+-- wpscript      = home .. "/.wallpaper"
+-- wpscript2     = themedir .. "/niceandclean.sh"
+-- 
+-- if awful.util.file_readable(wpscript2) then
+-- 	theme.wallpaper_cmd = { "sh " .. wpscript2 }
+-- elseif awful.util.file_readable(wallpaper1) then
+-- 	theme.wallpaper_cmd = { "awsetbg " .. wallpaper1 }
+-- elseif awful.util.file_readable(wallpaper2) then
+-- 	theme.wallpaper_cmd = { "awsetbg " .. wallpaper2 }
+-- elseif awful.util.file_readable(wpscript) then
+-- 	theme.wallpaper_cmd = { "sh " .. wpscript }
+-- elseif awful.util.file_readable(wallpaper3) then
+-- 	theme.wallpaper_cmd = { "awsetbg " .. wallpaper3 }
+-- else
+-- 	theme.wallpaper_cmd = { "awsetbg " .. wallpaper4 }
+-- end
 
 if awful.util.file_readable(config .. "/vain/init.lua") then
     theme.useless_gap_width  = "3"

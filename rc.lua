@@ -12,8 +12,7 @@ local beautiful = require("beautiful")
 local naughty = require("naughty")
 local menubar = require("menubar")
 
-
-naughty.config.default_preset.font = "Terminus 20"
+-- naughty.config.default_preset.font = "Terminus 20"
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -56,8 +55,8 @@ local function print(...)
 	notify(table.concat(flat, "\t"))
 end
 
--- beautiful.init("/usr/share/awesome/themes/niceandclean/theme.lua")
 beautiful.init("/home/leafo/.config/awesome/themes/niceandclean/theme.lua")
+-- beautiful.init("/usr/share/awesome/themes/default/theme.lua")
 
 -- This is used later as the default terminal and editor to run.
 terminal = "urxvt"
@@ -114,10 +113,13 @@ layouts =
 
 -- {{{ Wallpaper
 if beautiful.wallpaper then
+    local kind = beautiful.wallpaper_type or "maximized"
+    local wallpaper_args = beautiful.wallpaper_args or {}
     for s = 1, screen.count() do
-        gears.wallpaper.maximized(beautiful.wallpaper, s, true)
+        gears.wallpaper[kind](beautiful.wallpaper, s, unpack(wallpaper_args))
     end
 end
+
 -- }}}
 
 
