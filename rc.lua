@@ -134,7 +134,7 @@ for s = 1, screen.count() do
 		{"dev"},
 		{"term"},
 		{"music"},
-		{"float", awful.layout.suit.floating},
+		{"float"},
 	}
 
 	local name_list, layout_list = {}, {}
