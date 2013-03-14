@@ -12,6 +12,10 @@ local beautiful = require("beautiful")
 local naughty = require("naughty")
 local menubar = require("menubar")
 
+-- custom widgets
+local status = require("leaf.status")
+
+
 -- naughty.config.default_preset.font = "Terminus 20"
 
 -- {{{ Error handling
@@ -54,6 +58,8 @@ local function print(...)
 
 	notify(table.concat(flat, "\t"))
 end
+
+
 
 beautiful.init("/home/leafo/.config/awesome/themes/niceandclean/theme.lua")
 -- beautiful.init("/usr/share/awesome/themes/default/theme.lua")
@@ -170,6 +176,7 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 -- {{{ Wibox
 -- Create a textclock widget
 mytextclock = awful.widget.textclock()
+leaf_status = status.make_status()
 
 -- Create a wibox for each screen and add it
 mywibox = {}
@@ -248,6 +255,7 @@ for s = 1, screen.count() do
     local right_layout = wibox.layout.fixed.horizontal()
     if s == 1 then right_layout:add(wibox.widget.systray()) end
     right_layout:add(mytextclock)
+    right_layout:add(leaf_status)
     right_layout:add(mylayoutbox[s])
 
     -- Now bring it all together (with the tasklist in the middle)
