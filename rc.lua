@@ -91,7 +91,7 @@ if os.getenv("LAPTOP") then
 end
 
 os.execute"setxkbmap -option ctrl:nocaps"
-os.execute"/home/leafo/bin/selfspy.py -c /home/leafo/.selfspy.conf"
+-- os.execute"/home/leafo/bin/selfspy.py -c /home/leafo/.selfspy.conf"
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 layouts =
