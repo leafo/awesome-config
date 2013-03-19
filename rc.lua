@@ -59,7 +59,13 @@ local function print(...)
 	notify(table.concat(flat, "\t"))
 end
 
-
+local function dmenu_colors()
+    return "-nb '" ..  beautiful.bg_normal ..
+        "' -nf '" .. beautiful.fg_normal ..
+        "' -sb '" .. beautiful.bg_focus ..
+        "' -sf '" .. beautiful.fg_focus ..
+        "' -fn 'Terminus-16' "
+end
 
 beautiful.init("/home/leafo/.config/awesome/themes/niceandclean/theme.lua")
 -- beautiful.init("/usr/share/awesome/themes/default/theme.lua")
@@ -293,7 +299,7 @@ globalkeys = awful.util.table.join(
             if client.focus then client.focus:raise() end
         end),
 
-    awful.key({ modkey,           }, "w", function () mymainmenu:show({keygrabber=true}) end),
+    -- awful.key({ modkey,           }, "w", function () mymainmenu:show({keygrabber=true}) end),
 
     -- music stuff
     awful.key({ modkey, "Shift" }, "Left", function()
@@ -347,10 +353,11 @@ globalkeys = awful.util.table.join(
     -- awful.key({ modkey },            "r",     function () mypromptbox[mouse.screen]:run() end),
 
     awful.key({ modkey }, "r", function ()
-        awful.util.spawn("dmenu_run -i -p 'Run command:' -nb '" ..
-            beautiful.bg_normal .. "' -nf '" .. beautiful.fg_normal ..
-            "' -sb '" .. beautiful.bg_focus ..
-            "' -sf '" .. beautiful.fg_focus .. "'")
+        awful.util.spawn("dmenu_run -i -p 'Run command:' " .. dmenu_colors())
+    end),
+
+    awful.key({ modkey }, "o", function ()
+        awful.util.spawn_with_shell([[wmctrl -l | dmenu -i -l 20 ]] .. dmenu_colors() .. [[ | sed -e 's/.*\(0x[^ ]\+\).*/\1/g' | xargs wmctrl -ia]])
     end),
 
     awful.key({ modkey }, "x",
@@ -380,7 +387,7 @@ clientkeys = awful.util.table.join(
     awful.key({ modkey, "Shift"   }, "c",      function (c) c:kill()                         end),
     awful.key({ modkey, "Control" }, "space",  awful.client.floating.toggle                     ),
     awful.key({ modkey, "Control" }, "Return", function (c) c:swap(awful.client.getmaster()) end),
-    awful.key({ modkey,           }, "o",      awful.client.movetoscreen                        ),
+    -- awful.key({ modkey,           }, "o",      awful.client.movetoscreen                        ),
     awful.key({ modkey, "Shift"   }, "r",      function (c) c:redraw()                       end),
     awful.key({ modkey,           }, "t",      function (c) c.ontop = not c.ontop            end),
     awful.key({ modkey,           }, "n",
