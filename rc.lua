@@ -10,7 +10,6 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 -- Notification library
 local naughty = require("naughty")
-local menubar = require("menubar")
 
 -- custom widgets
 local status = require("leaf.status")
@@ -79,19 +78,6 @@ editor_cmd = terminal .. " -e " .. editor
 -- Usually, Mod4 is the key with a logo between Control and Alt.
 -- If you do not like this or do not have such a key,
 -- I suggest you to remap Mod4 to another key using xmodmap or other tools.
-local function notify(msg)
-	awful.util.spawn("notify-send " .. ("%q"):format(msg))
-end
-
-local function print(...)
-	local flat = {}
-	for _, arg in ipairs{...} do
-		table.insert(flat, tostring(arg))
-	end
-
-	notify(table.concat(flat, "\t"))
-end
-
 -- However, you can use another modifier like Mod1, but it may interact with others.
 
 modkey = "Mod4"
@@ -146,7 +132,7 @@ for s = 1, screen.count() do
 		{"dev"},
 		{"term"},
 		{"music"},
-		{"float"},
+		{"float", awful.layout.suit.floating},
 	}
 
 	local name_list, layout_list = {}, {}
@@ -174,14 +160,10 @@ mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesom
 
 mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon,
                                      menu = mymainmenu })
--- Menubar configuration
-menubar.utils.terminal = terminal -- Set the terminal for applications that require it
--- }}}
 
 -- {{{ Wibox
 -- Create a textclock widget
 mytextclock = awful.widget.textclock()
-leaf_status = status.make_status()
 
 -- Create a wibox for each screen and add it
 mywibox = {}
@@ -260,7 +242,11 @@ for s = 1, screen.count() do
     local right_layout = wibox.layout.fixed.horizontal()
     if s == 1 then right_layout:add(wibox.widget.systray()) end
     right_layout:add(mytextclock)
-    right_layout:add(leaf_status)
+
+    -- custom wigets
+    right_layout:add(status.make_hamster_textbox())
+    right_layout:add(status.make_selfspy_textbox())
+
     right_layout:add(mylayoutbox[s])
 
     -- Now bring it all together (with the tasklist in the middle)
@@ -348,9 +334,11 @@ globalkeys = awful.util.table.join(
 
     awful.key({ modkey, "Control" }, "n", awful.client.restore),
 
-    -- Prompt
-    -- awful.key({ modkey },            "r",     function () mypromptbox[mouse.screen]:run() end),
+    awful.key({ modkey }, "p", function ()
+        awful.util.spawn("hamster-dmenu")
+    end),
 
+    -- Prompt
     awful.key({ modkey }, "r", function ()
         awful.util.spawn("dmenu_run -i -p 'Run command:' " .. dmenu_colors())
     end),
@@ -359,15 +347,12 @@ globalkeys = awful.util.table.join(
         awful.util.spawn_with_shell([[wmctrl -l | dmenu -i -l 20 ]] .. dmenu_colors() .. [[ | sed -e 's/.*\(0x[^ ]\+\).*/\1/g' | xargs wmctrl -ia]])
     end),
 
-    awful.key({ modkey }, "x",
-              function ()
-                  awful.prompt.run({ prompt = "Run Lua code: " },
-                  mypromptbox[mouse.screen].widget,
-                  awful.util.eval, nil,
-                  awful.util.getdir("cache") .. "/history_eval")
-              end),
-    -- Menubar
-    awful.key({ modkey }, "p", function() menubar.show() end)
+    awful.key({ modkey }, "x", function ()
+        awful.prompt.run({ prompt = "Run Lua code: " },
+        mypromptbox[mouse.screen].widget,
+        awful.util.eval, nil,
+        awful.util.getdir("cache") .. "/history_eval")
+    end)
 )
 
 clientkeys = awful.util.table.join(

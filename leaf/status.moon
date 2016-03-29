@@ -3,7 +3,13 @@ textbox = require "wibox.widget.textbox"
 awful = require "awful"
 naughty = require "naughty"
 
-make_status = (timeout=60) ->
+
+local refresh_hamster
+
+refresh = ->
+  refresh_hamster() if refresh_hamster
+
+make_selfspy_textbox = (timeout=60) ->
   w = textbox!
 
   check_running = ->
@@ -15,7 +21,12 @@ make_status = (timeout=60) ->
 
   t = with timer(:timeout)
     \connect_signal "timeout", ->
-      w\set_markup "[selfspy: #{check_running! and "ON" or "OFF"}] "
+      str = if check_running!
+        '<span color="#B7CE42">SP✓</span>'
+      else
+        '<span color="#F00060">SP✕</span>'
+
+      w\set_markup "#{str} "
 
     \start!
     \emit_signal "timeout"
@@ -27,4 +38,23 @@ make_status = (timeout=60) ->
 
   w
 
-{ :make_status }
+make_hamster_textbox = (timeout=30) ->
+  return nil if refresh_hamster
+
+  w = textbox!
+
+  current_activity = ->
+    awful.util.pread("hamster-current")\match "[^%s]+"
+
+  refresh_hamster = ->
+    activity = current_activity!
+    w\set_markup "<span color='#777777'>[</span>#{activity}<span color='#777777'>]</span> "
+
+  t = with timer(:timeout)
+    \connect_signal "timeout", refresh_hamster
+    \start!
+    \emit_signal "timeout"
+
+  w
+
+{ :make_selfspy_textbox, :make_hamster_textbox, :refresh }

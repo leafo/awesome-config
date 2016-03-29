@@ -1,8 +1,15 @@
 local textbox = require("wibox.widget.textbox")
 local awful = require("awful")
 local naughty = require("naughty")
-local make_status
-make_status = function(timeout)
+local refresh_hamster
+local refresh
+refresh = function()
+  if refresh_hamster then
+    return refresh_hamster()
+  end
+end
+local make_selfspy_textbox
+make_selfspy_textbox = function(timeout)
   if timeout == nil then
     timeout = 60
   end
@@ -24,7 +31,13 @@ make_status = function(timeout)
       timeout = timeout
     })
     _with_0:connect_signal("timeout", function()
-      return w:set_markup("[selfspy: " .. tostring(check_running() and "ON" or "OFF") .. "] ")
+      local str
+      if check_running() then
+        str = '<span color="#B7CE42">SP✓</span>'
+      else
+        str = '<span color="#F00060">SP✕</span>'
+      end
+      return w:set_markup(tostring(str) .. " ")
     end)
     _with_0:start()
     _with_0:emit_signal("timeout")
@@ -38,6 +51,37 @@ make_status = function(timeout)
   end)
   return w
 end
+local make_hamster_textbox
+make_hamster_textbox = function(timeout)
+  if timeout == nil then
+    timeout = 30
+  end
+  if refresh_hamster then
+    return nil
+  end
+  local w = textbox()
+  local current_activity
+  current_activity = function()
+    return awful.util.pread("hamster-current"):match("[^%s]+")
+  end
+  refresh_hamster = function()
+    local activity = current_activity()
+    return w:set_markup("<span color='#777777'>[</span>" .. tostring(activity) .. "<span color='#777777'>]</span> ")
+  end
+  local t
+  do
+    local _with_0 = timer({
+      timeout = timeout
+    })
+    _with_0:connect_signal("timeout", refresh_hamster)
+    _with_0:start()
+    _with_0:emit_signal("timeout")
+    t = _with_0
+  end
+  return w
+end
 return {
-  make_status = make_status
+  make_selfspy_textbox = make_selfspy_textbox,
+  make_hamster_textbox = make_hamster_textbox,
+  refresh = refresh
 }
