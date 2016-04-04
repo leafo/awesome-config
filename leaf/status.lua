@@ -1,7 +1,7 @@
 local textbox = require("wibox.widget.textbox")
 local awful = require("awful")
 local naughty = require("naughty")
-local refresh_hamster
+local hamster_text, selfspy_text, refresh_hamster
 local refresh
 refresh = function()
   if refresh_hamster then
@@ -12,6 +12,9 @@ local make_selfspy_textbox
 make_selfspy_textbox = function(timeout)
   if timeout == nil then
     timeout = 60
+  end
+  if selfspy_text then
+    return selfspy_text
   end
   local w = textbox()
   local check_running
@@ -49,6 +52,7 @@ make_selfspy_textbox = function(timeout)
     })
     return t:emit_signal("timeout")
   end)
+  selfspy_text = w
   return w
 end
 local make_hamster_textbox
@@ -56,8 +60,8 @@ make_hamster_textbox = function(timeout)
   if timeout == nil then
     timeout = 30
   end
-  if refresh_hamster then
-    return nil
+  if hamster_text then
+    return hamster_text
   end
   local w = textbox()
   local current_activity
@@ -78,6 +82,7 @@ make_hamster_textbox = function(timeout)
     _with_0:emit_signal("timeout")
     t = _with_0
   end
+  hamster_text = w
   return w
 end
 return {

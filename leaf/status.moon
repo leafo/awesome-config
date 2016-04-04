@@ -4,12 +4,14 @@ awful = require "awful"
 naughty = require "naughty"
 
 
-local refresh_hamster
+local hamster_text, selfspy_text, refresh_hamster
 
 refresh = ->
   refresh_hamster() if refresh_hamster
 
 make_selfspy_textbox = (timeout=60) ->
+  return selfspy_text if selfspy_text
+
   w = textbox!
 
   check_running = ->
@@ -36,10 +38,11 @@ make_selfspy_textbox = (timeout=60) ->
     naughty.notify text: "running: #{check_running!}"
     t\emit_signal "timeout"
 
+  selfspy_text = w
   w
 
 make_hamster_textbox = (timeout=30) ->
-  return nil if refresh_hamster
+  return hamster_text if hamster_text
 
   w = textbox!
 
@@ -55,6 +58,7 @@ make_hamster_textbox = (timeout=30) ->
     \start!
     \emit_signal "timeout"
 
+  hamster_text = w
   w
 
 { :make_selfspy_textbox, :make_hamster_textbox, :refresh }
