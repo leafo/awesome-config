@@ -14,8 +14,8 @@ local naughty = require("naughty")
 -- custom widgets
 local status = require("leaf.status")
 
-
 -- naughty.config.default_preset.font = "Terminus 20"
+naughty.config.defaults.font = "xos4 terminus 20"
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -63,7 +63,7 @@ local function dmenu_colors()
         "' -nf '" .. beautiful.fg_normal ..
         "' -sb '" .. beautiful.bg_focus ..
         "' -sf '" .. beautiful.fg_focus ..
-        "' -fn 'Terminus-16' "
+        "' -fn 'xos4 Terminus-16' "
 end
 
 beautiful.init("/home/leafo/.config/awesome/themes/niceandclean/theme.lua")
