@@ -14,7 +14,8 @@ local naughty = require("naughty")
 -- custom widgets
 local status = require("leaf.status")
 
--- naughty.config.default_preset.font = "Terminus 20"
+local hotkeys_popup = require("awful.hotkeys_popup").widget
+
 naughty.config.defaults.font = "xos4 terminus 20"
 
 -- {{{ Error handling
@@ -46,16 +47,16 @@ end
 -- Themes define colours, icons, and wallpapers
 
 local function notify(msg)
-	awful.util.spawn("notify-send " .. ("%q"):format(msg))
+    awful.util.spawn("notify-send " .. ("%q"):format(msg))
 end
 
 local function print(...)
-	local flat = {}
-	for _, arg in ipairs{...} do
-		table.insert(flat, tostring(arg))
-	end
+    local flat = {}
+    for _, arg in ipairs{...} do
+        table.insert(flat, tostring(arg))
+    end
 
-	notify(table.concat(flat, "\t"))
+    notify(table.concat(flat, "\t"))
 end
 
 local function dmenu_colors()
@@ -126,20 +127,20 @@ end
 tags = {}
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
-	local default = layouts[1]
-	local layout_pairs = {
-		{"www", awful.layout.suit.max},
-		{"dev"},
-		{"term"},
-		{"music"},
-		{"float", awful.layout.suit.floating},
-	}
+    local default = layouts[1]
+    local layout_pairs = {
+        {"www", awful.layout.suit.max},
+        {"dev"},
+        {"term"},
+        {"music"},
+        {"float", awful.layout.suit.floating},
+    }
 
-	local name_list, layout_list = {}, {}
-	for _, item in pairs(layout_pairs) do
-		table.insert(name_list, item[1])
-		table.insert(layout_list, item[2] or default)
-	end
+    local name_list, layout_list = {}, {}
+    for _, item in pairs(layout_pairs) do
+        table.insert(name_list, item[1])
+        table.insert(layout_list, item[2] or default)
+    end
 
     tags[s] = awful.tag(name_list, s, layout_list)
 end
@@ -269,9 +270,14 @@ root.buttons(awful.util.table.join(
 
 -- {{{ Key bindings
 globalkeys = awful.util.table.join(
-    awful.key({ modkey,           }, "Left",   awful.tag.viewprev       ),
-    awful.key({ modkey,           }, "Right",  awful.tag.viewnext       ),
-    awful.key({ modkey,           }, "Escape", awful.tag.history.restore),
+    awful.key({ modkey,           }, "s",      hotkeys_popup.show_help,
+              {description="show help", group="awesome"}),
+    awful.key({ modkey,           }, "Left",   awful.tag.viewprev,
+              {description = "view previous", group = "tag"}),
+    awful.key({ modkey,           }, "Right",  awful.tag.viewnext,
+              {description = "view next", group = "tag"}),
+    awful.key({ modkey,           }, "Escape", awful.tag.history.restore,
+              {description = "go back", group = "tag"}),
 
     awful.key({ modkey,           }, "j",
         function ()
@@ -288,20 +294,20 @@ globalkeys = awful.util.table.join(
 
     -- music stuff
     awful.key({ modkey, "Shift" }, "Left", function()
-		awful.util.spawn("mpc toggle")
-	end),
+        awful.util.spawn("mpc toggle")
+    end),
 
     awful.key({ }, "Pause", function()
-		awful.util.spawn("mpc toggle")
-	end),
+        awful.util.spawn("mpc toggle")
+    end),
 
     awful.key({ modkey }, "Up", function()
-		awful.util.spawn("amixer set Master 5%+")
-	end),
+        awful.util.spawn("amixer set Master 5%+")
+    end),
 
     awful.key({ modkey }, "Down", function()
-		awful.util.spawn("amixer set Master 5%-")
-	end),
+        awful.util.spawn("amixer set Master 5%-")
+    end),
 
 
     -- Layout manipulation
@@ -398,30 +404,42 @@ end
 -- This should map on the top row of your keyboard, usually 1 to 9.
 for i = 1, keynumber do
     globalkeys = awful.util.table.join(globalkeys,
+        -- view tag only
         awful.key({ modkey }, "#" .. i + 9,
                   function ()
-                        local screen = mouse.screen
-                        if tags[screen][i] then
-                            awful.tag.viewonly(tags[screen][i])
+                        local screen = awful.screen.focused()
+                        local tag = screen.tags[i]
+                        if tag then
+                           tag:view_only()
                         end
                   end),
+        -- toggle tag
         awful.key({ modkey, "Control" }, "#" .. i + 9,
                   function ()
-                      local screen = mouse.screen
-                      if tags[screen][i] then
-                          awful.tag.viewtoggle(tags[screen][i])
+                      local screen = awful.screen.focused()
+                      local tag = screen.tags[i]
+                      if tag then
+                         awful.tag.viewtoggle(tag)
                       end
                   end),
+        -- move client to tag
         awful.key({ modkey, "Shift" }, "#" .. i + 9,
                   function ()
-                      if client.focus and tags[client.focus.screen][i] then
-                          awful.client.movetotag(tags[client.focus.screen][i])
-                      end
+                      if client.focus then
+                          local tag = client.focus.screen.tags[i]
+                          if tag then
+                              client.focus:move_to_tag(tag)
+                          end
+                     end
                   end),
+        -- toggle tag on focused client
         awful.key({ modkey, "Control", "Shift" }, "#" .. i + 9,
                   function ()
-                      if client.focus and tags[client.focus.screen][i] then
-                          awful.client.toggletag(tags[client.focus.screen][i])
+                      if client.focus then
+                          local tag = client.focus.screen.tags[i]
+                          if tag then
+                              client.focus:toggle_tag(tag)
+                          end
                       end
                   end))
 end
