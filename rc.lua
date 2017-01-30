@@ -17,6 +17,7 @@ local status = require("leaf.status")
 local hotkeys_popup = require("awful.hotkeys_popup").widget
 
 naughty.config.defaults.font = "xos4 terminus 20"
+naughty.config.defaults.icon_size = 32
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
