@@ -27,7 +27,7 @@ make_selfwatch_textbox = (timeout=60) ->
       check_running (running) ->
         if running
           get_status (status) ->
-            w\set_markup '<span color="#B7CE42">✓ ' .. status .. ' </span>'
+            w\set_markup '<span color="#B7CE42">✓ ' .. status .. '</span> '
         else
           w\set_markup '<span color="#F00060">✕ SW</span> '
 

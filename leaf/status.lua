@@ -38,7 +38,7 @@ make_selfwatch_textbox = function(timeout)
       return check_running(function(running)
         if running then
           return get_status(function(status)
-            return w:set_markup('<span color="#B7CE42">✓ ' .. status .. ' </span>')
+            return w:set_markup('<span color="#B7CE42">✓ ' .. status .. '</span> ')
           end)
         else
           return w:set_markup('<span color="#F00060">✕ SW</span> ')
