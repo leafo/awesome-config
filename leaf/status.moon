@@ -4,41 +4,40 @@ awful = require "awful"
 naughty = require "naughty"
 
 
-local hamster_text, selfspy_text, refresh_hamster
+local hamster_text, selfwatch_text, refresh_hamster
 
 refresh = ->
   refresh_hamster() if refresh_hamster
 
-make_selfspy_textbox = (timeout=60) ->
-  return selfspy_text if selfspy_text
+make_selfwatch_textbox = (timeout=60) ->
+  return selfwatch_text if selfwatch_text
 
   w = textbox!
 
-  check_running = ->
-    awful.util.pread("ps x | grep selfspy")\match "python2"
+  check_running = (fn) ->
+    awful.spawn.easy_async "pidof selfwatch", (stdout, stderr, reason, code) ->
+      fn code == 0
 
-  run = ->
-    naughty.notify text: "Starting selfspy..."
-    awful.util.spawn_with_shell "selfspy.py -c /home/leafo/.selfspy.conf"
+  get_status = (fn) ->
+    awful.spawn.easy_async "selfwatch -config /home/leafo/.selfwatch/selfwatch.json status", (stdout, stderr, reason, code) ->
+      fn stdout
 
   t = with timer(:timeout)
     \connect_signal "timeout", ->
-      str = if check_running!
-        '<span color="#B7CE42">SP✓</span>'
-      else
-        '<span color="#F00060">SP✕</span>'
-
-      w\set_markup "#{str} "
+      check_running (running) ->
+        if running
+          get_status (status) ->
+            w\set_markup '<span color="#B7CE42">✓ ' .. status .. ' </span>'
+        else
+          w\set_markup '<span color="#F00060">✕ SW</span> '
 
     \start!
     \emit_signal "timeout"
 
   w\connect_signal "button::press", ->
-    -- run! unless check_running!
-    naughty.notify text: "running: #{check_running!}"
     t\emit_signal "timeout"
 
-  selfspy_text = w
+  selfwatch_text = w
   w
 
 make_hamster_textbox = (timeout=30) ->
@@ -61,4 +60,4 @@ make_hamster_textbox = (timeout=30) ->
   hamster_text = w
   w
 
-{ :make_selfspy_textbox, :make_hamster_textbox, :refresh }
+{ :make_selfwatch_textbox, :make_hamster_textbox, :refresh }

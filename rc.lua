@@ -245,8 +245,8 @@ for s = 1, screen.count() do
     right_layout:add(mytextclock)
 
     -- custom wigets
-    right_layout:add(status.make_hamster_textbox())
-    right_layout:add(status.make_selfspy_textbox())
+    -- right_layout:add(status.make_hamster_textbox())
+    right_layout:add(status.make_selfwatch_textbox())
 
     right_layout:add(mylayoutbox[s])
 
