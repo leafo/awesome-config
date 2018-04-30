@@ -417,21 +417,10 @@ globalkeys = awful.util.table.join(
 )
 
 clientkeys = awful.util.table.join(
-    awful.key({ modkey }, "d", function(c)
-        if awful.client.floating.get(c) then
-            awful.client.floating.set(c, false)
-            c.ontop = false
-            c.sticky = false
-        else
-            awful.client.floating.set(c, true)
-            c.ontop = true
-            c.sticky = true
-        end
-    end, {
-        description = "float and stick on top",
+    awful.key({ modkey }, "d", awful.placement.under_mouse, {
+        description = "place under mouse",
         group = "client"
     }),
-
 
     awful.key({ modkey,           }, "f",
         function (c)
