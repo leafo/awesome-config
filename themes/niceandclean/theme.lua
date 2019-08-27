@@ -50,7 +50,8 @@ if awful.util.file_readable(config .. "/vain/init.lua") then
 end
 --}}}
 
-theme.font          = "xos4 Terminus 10"
+-- theme.font          = "xos4 Terminus 10"
+theme.font          = "Terminus (TTF) 12"
 
 theme.bg_normal     = "#222222"
 theme.bg_focus      = "#d8d8d8"
