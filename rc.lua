@@ -315,14 +315,14 @@ local globalkeys = awful.util.table.join(
     }),
 
     awful.key({ modkey }, "Up", function()
-        awful.util.spawn("amixer set Master 5%+")
+        awful.util.spawn("pactl set-sink-volume @DEFAULT_SINK@ +5%")
     end, {
         description = "volume up",
         group = "music"
     }),
 
     awful.key({ modkey }, "Down", function()
-        awful.util.spawn("amixer set Master 5%-")
+        awful.util.spawn("pactl set-sink-volume @DEFAULT_SINK@ -5%")
     end, {
         description = "volume down",
         group = "music"
