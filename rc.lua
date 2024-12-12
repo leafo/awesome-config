@@ -71,7 +71,7 @@ local function dmenu_colors()
         "' -nf '" .. beautiful.fg_normal ..
         "' -sb '" .. beautiful.bg_focus ..
         "' -sf '" .. beautiful.fg_focus ..
-        "' -fn 'Terminus-16' "
+        "' -fn 'Terminus-20' "
 end
 
 -- This is used later as the default terminal and editor to run.
