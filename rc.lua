@@ -75,8 +75,8 @@ local function dmenu_colors()
 end
 
 -- This is used later as the default terminal and editor to run.
-local terminal = "urxvt"
-local editor = os.getenv("EDITOR") or "vim"
+local terminal = "alacritty"
+local editor = os.getenv("EDITOR") or "nvim"
 local editor_cmd = terminal .. " -e " .. editor
 
 -- Default modkey.

@@ -19,7 +19,7 @@ make_selfwatch_textbox = (timeout=60) ->
       fn code == 0
 
   get_status = (fn) ->
-    awful.spawn.easy_async "selfwatch -config /home/leafo/.selfwatch/selfwatch.json status", (stdout, stderr, reason, code) ->
+    awful.spawn.easy_async "selfwatch status", (stdout, stderr, reason, code) ->
       fn stdout
 
   t = with timer(:timeout)

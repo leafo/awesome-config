@@ -25,7 +25,7 @@ make_selfwatch_textbox = function(timeout)
   end
   local get_status
   get_status = function(fn)
-    return awful.spawn.easy_async("selfwatch -config /home/leafo/.selfwatch/selfwatch.json status", function(stdout, stderr, reason, code)
+    return awful.spawn.easy_async("selfwatch status", function(stdout, stderr, reason, code)
       return fn(stdout)
     end)
   end
