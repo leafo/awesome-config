@@ -15,6 +15,9 @@ local beautiful = require("beautiful")
 
 local tabs = {}
 
+-- Set from rc.lua through `tabs.client_keys(modkey)`.
+tabs.modkey = "Mod4"
+
 local XPROP = "_LEAF_TAB_GROUP"
 awesome.register_xproperty(XPROP, "string")
 
@@ -93,6 +96,7 @@ local function make_tab(g, c)
             end
         end),
         awful.button({}, 2, function() tabs.detach(c) end),
+        awful.button({ tabs.modkey }, 1, function() tabs.tear_off(c) end),
         awful.button({}, 3, function()
             tabs.activate(c)
             awful.mouse.client.resize(c)
@@ -199,8 +203,8 @@ local function remove(c, dying)
             nxt.hidden = false
         end
     elseif not dying and front then
-        -- A background tab leaves: show it next to the stack.
-        c:tags(front:tags())
+        -- A background tab leaves: it reappears where the stack is.
+        transfer(front, c, false, false)
     end
 
     if dying then
@@ -228,6 +232,41 @@ function tabs.detach(c)
     if not (c and group_of[c]) then return end
     remove(c, false)
     focus(c)
+end
+
+-- Set while a tear-off is starting, so the same press doesn't also move
+-- the stack through the client's own modkey-drag binding.
+local tearing_off = false
+
+-- Replacement for `awful.mouse.client.move` in the client's modkey-drag
+-- binding. Titlebar presses also reach client bindings (after the tab's own
+-- handler), so without this a modkey-drag on a tab would move the stack.
+function tabs.client_move(c)
+    if tearing_off then return end
+    awful.mouse.client.move(c)
+end
+
+-- Detach `c` and start dragging it, for a modkey-drag on its tab.
+function tabs.tear_off(c)
+    if not (c and c.valid and group_of[c]) then return end
+    tearing_off = true
+    tabs.detach(c)
+
+    -- Detaching gives a tiled window its own slot, but the layout only
+    -- moves it there at the end of this main loop iteration. Start the move
+    -- after that, or it works from the stale geometry. Delayed calls run
+    -- within the same iteration, so the button is still held.
+    gears.timer.delayed_call(function()
+        tearing_off = false
+        if not c.valid then return end
+        local tiled = not c.floating
+            and awful.layout.get(c.screen) ~= awful.layout.suit.floating
+        if tiled then
+            -- Its new slot may be far from the pointer; put it in hand.
+            awful.placement.under_mouse(c)
+        end
+        awful.mouse.client.move(c)
+    end)
 end
 
 -- Pull `target` into the stack of `home` as background tabs. If `target` is
@@ -428,6 +467,7 @@ client.connect_signal("manage", function(c)
 end)
 
 function tabs.client_keys(modkey)
+    tabs.modkey = modkey
     return gears.table.join(
         awful.key({ modkey }, "g", function(c) tabs.group_mode(c, modkey) end,
             { description = "group mode: hold mod, click windows to add as tabs", group = "tabs" }),
