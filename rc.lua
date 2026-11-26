@@ -15,6 +15,7 @@ unpack = unpack or table.unpack
 
 -- custom widgets
 local status = require("leaf.status")
+local tabs = require("leaf.tabs")
 
 local hotkeys_popup = require("awful.hotkeys_popup").widget
 
@@ -86,12 +87,6 @@ local editor_cmd = terminal .. " -e " .. editor
 -- However, you can use another modifier like Mod1, but it may interact with others.
 
 local modkey = "Mod4"
-local other_modkey = "Mod1"
-
--- swap if laptop
-if os.getenv("LAPTOP") then
-    modkey, other_modkey = other_modkey, modkey
-end
 
 os.execute"setxkbmap -option ctrl:nocaps"
 -- os.execute"/home/leafo/bin/selfspy.py -c /home/leafo/.selfspy.conf"
@@ -454,7 +449,10 @@ local clientkeys = awful.util.table.join(
             c.maximized = not c.maximized
             c:raise()
         end ,
-        {description = "maximize", group = "client"})
+        {description = "maximize", group = "client"}),
+
+    -- tabbed window stacks (leaf/tabs.lua)
+    tabs.client_keys(modkey)
 )
 
 -- Bind all key numbers to tags.
