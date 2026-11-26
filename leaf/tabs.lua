@@ -292,6 +292,48 @@ local function client_at(x, y)
     end
 end
 
+-- Outline drawn around the window a group-mode click would pull in. Four
+-- bars rather than one translucent overlay, since there's no compositor.
+local highlight_bars
+
+local function hide_highlight()
+    for _, bar in ipairs(highlight_bars or {}) do
+        bar.visible = false
+    end
+end
+
+local function show_highlight(c)
+    if not highlight_bars then
+        highlight_bars = {}
+        for i = 1, 4 do
+            highlight_bars[i] = wibox {
+                ontop = true,
+                visible = false,
+                width = 1,
+                height = 1,
+                bg = beautiful.tabs_highlight_color or "#b7ce42",
+            }
+        end
+    end
+
+    local g = c:geometry()
+    local bw = c.border_width or 0
+    local x, y = g.x, g.y
+    local w, h = g.width + 2 * bw, g.height + 2 * bw
+    local t = tonumber(beautiful.tabs_highlight_width) or 5
+
+    local rects = {
+        { x = x, y = y, width = w, height = t },
+        { x = x, y = y + h - t, width = w, height = t },
+        { x = x, y = y, width = t, height = h },
+        { x = x + w - t, y = y, width = t, height = h },
+    }
+    for i, bar in ipairs(highlight_bars) do
+        bar:geometry(rects[i])
+        bar.visible = true
+    end
+end
+
 -- Group mode: while `modkey` stays held, clicking a window pulls it into the
 -- stack of `home`. Releasing `modkey` (or Escape) ends it.
 function tabs.group_mode(home, modkey)
@@ -300,9 +342,19 @@ function tabs.group_mode(home, modkey)
     local keygrabber
     local was_pressed = false
 
+    -- The window a click at (x, y) would pull in, if any.
+    local function target_at(x, y)
+        local c = client_at(x, y)
+        if not c or c == home then return end
+        local g = group_of[home]
+        if g and group_of[c] == g then return end
+        return c
+    end
+
     local function stop()
         awful.keygrabber.stop(keygrabber)
         mousegrabber.stop()
+        hide_highlight()
     end
 
     keygrabber = awful.keygrabber.run(function(mods, key, event)
@@ -315,20 +367,33 @@ function tabs.group_mode(home, modkey)
     end)
 
     mousegrabber.run(function(m)
+        if not home.valid then
+            stop()
+            return false
+        end
+
+        local target = target_at(m.x, m.y)
         local pressed = m.buttons[1]
-        if pressed and not was_pressed then
-            if not home.valid then
-                stop()
-                return false
-            end
-            local target = client_at(m.x, m.y)
-            if target then
-                tabs.pull(home, target)
-            end
+        if pressed and not was_pressed and target then
+            tabs.pull(home, target)
+            -- The layout is about to reshuffle; redraw on the next motion.
+            target = nil
         end
         was_pressed = pressed
+
+        if target then
+            show_highlight(target)
+        else
+            hide_highlight()
+        end
         return true
     end, "crosshair")
+
+    local coords = mouse.coords()
+    local initial = target_at(coords.x, coords.y)
+    if initial then
+        show_highlight(initial)
+    end
 end
 
 function tabs.client_keys(modkey)
