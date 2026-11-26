@@ -382,13 +382,6 @@ local globalkeys = awful.util.table.join(
           group = "client"
       }),
 
-    awful.key({ modkey }, "p", function ()
-        awful.util.spawn("hamster-dmenu")
-    end, {
-        description = "set task in hamster",
-        group = "dmenu"
-    }),
-
     -- Prompt
     awful.key({ modkey }, "r", function ()
         awful.util.spawn("dmenu_run -i -p 'Run command:' " .. dmenu_colors())

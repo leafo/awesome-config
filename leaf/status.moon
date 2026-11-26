@@ -3,11 +3,7 @@ textbox = require "wibox.widget.textbox"
 awful = require "awful"
 naughty = require "naughty"
 
-
-local hamster_text, selfwatch_text, refresh_hamster
-
-refresh = ->
-  refresh_hamster() if refresh_hamster
+local selfwatch_text
 
 make_selfwatch_textbox = (timeout=60) ->
   return selfwatch_text if selfwatch_text
@@ -40,24 +36,4 @@ make_selfwatch_textbox = (timeout=60) ->
   selfwatch_text = w
   w
 
-make_hamster_textbox = (timeout=30) ->
-  return hamster_text if hamster_text
-
-  w = textbox!
-
-  current_activity = ->
-    awful.util.pread("hamster-current")\match "[^%s]+"
-
-  refresh_hamster = ->
-    activity = current_activity!
-    w\set_markup "<span color='#777777'>[</span>#{activity}<span color='#777777'>]</span> "
-
-  t = with timer(:timeout)
-    \connect_signal "timeout", refresh_hamster
-    \start!
-    \emit_signal "timeout"
-
-  hamster_text = w
-  w
-
-{ :make_selfwatch_textbox, :make_hamster_textbox, :refresh }
+{ :make_selfwatch_textbox }
