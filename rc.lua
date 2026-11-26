@@ -55,7 +55,7 @@ end
 beautiful.init("/home/leafo/.config/awesome/themes/niceandclean/theme.lua")
 
 local function notify(msg)
-    awful.util.spawn("notify-send " .. ("%q"):format(msg))
+    awful.spawn("notify-send " .. ("%q"):format(msg))
 end
 
 local function print(...)
@@ -142,16 +142,20 @@ local mylauncher = awful.widget.launcher({
 
 -- {{{ Wibox
 -- Create a textclock widget
-local mytextclock = awful.widget.textclock()
+local mytextclock = wibox.widget.textclock()
 
 -- Create a wibox for each screen and add it
-local taglist_buttons = awful.util.table.join(
-    awful.button({ }, 1, awful.tag.viewonly),
-    awful.button({ modkey }, 1, awful.client.movetotag),
+local taglist_buttons = gears.table.join(
+    awful.button({ }, 1, function(t) t:view_only() end),
+    awful.button({ modkey }, 1, function(t)
+        if client.focus then client.focus:move_to_tag(t) end
+    end),
     awful.button({ }, 3, awful.tag.viewtoggle),
-    awful.button({ modkey }, 3, awful.client.toggletag),
-    awful.button({ }, 4, function(t) awful.tag.viewnext(awful.tag.getscreen(t)) end),
-    awful.button({ }, 5, function(t) awful.tag.viewprev(awful.tag.getscreen(t)) end)
+    awful.button({ modkey }, 3, function(t)
+        if client.focus then client.focus:toggle_tag(t) end
+    end),
+    awful.button({ }, 4, function(t) awful.tag.viewnext(t.screen) end),
+    awful.button({ }, 5, function(t) awful.tag.viewprev(t.screen) end)
 )
 
 
@@ -168,14 +172,14 @@ local function client_menu_toggle_fn()
     end
 end
 
-local tasklist_buttons = awful.util.table.join(
+local tasklist_buttons = gears.table.join(
     awful.button({ }, 1, function (c)
         if c == client.focus then
             c.minimized = true
         else
             c.minimized = false
             if not c:isvisible() then
-                awful.tag.viewonly(c:tags()[1])
+                c:tags()[1]:view_only()
             end
             -- This will also un-minimize
             -- the client, if needed
@@ -260,7 +264,7 @@ end)
 
 
 -- {{{ Mouse bindings
-root.buttons(awful.util.table.join(
+root.buttons(gears.table.join(
     awful.button({ }, 3, function () mymainmenu:toggle() end),
     awful.button({ }, 4, awful.tag.viewnext),
     awful.button({ }, 5, awful.tag.viewprev)
@@ -268,7 +272,7 @@ root.buttons(awful.util.table.join(
 -- }}}
 
 -- {{{ Key bindings
-local globalkeys = awful.util.table.join(
+local globalkeys = gears.table.join(
     awful.key({ modkey,           }, "s",      hotkeys_popup.show_help,
               {description="show help", group="awesome"}),
     awful.key({ modkey,           }, "Left",   awful.tag.viewprev,
@@ -296,28 +300,28 @@ local globalkeys = awful.util.table.join(
 
     -- music stuff
     awful.key({ modkey, "Shift" }, "Left", function()
-        awful.util.spawn("mpc toggle")
+        awful.spawn("mpc toggle")
     end, {
         description = "mpc toggle",
         group = "music"
     }),
 
     awful.key({ }, "Pause", function()
-        awful.util.spawn("mpc toggle")
+        awful.spawn("mpc toggle")
     end, {
         description = "mpc toggle",
         group = "music"
     }),
 
     awful.key({ modkey }, "Up", function()
-        awful.util.spawn("pactl set-sink-volume @DEFAULT_SINK@ +5%")
+        awful.spawn("pactl set-sink-volume @DEFAULT_SINK@ +5%")
     end, {
         description = "volume up",
         group = "music"
     }),
 
     awful.key({ modkey }, "Down", function()
-        awful.util.spawn("pactl set-sink-volume @DEFAULT_SINK@ -5%")
+        awful.spawn("pactl set-sink-volume @DEFAULT_SINK@ -5%")
     end, {
         description = "volume down",
         group = "music"
@@ -384,14 +388,14 @@ local globalkeys = awful.util.table.join(
 
     -- Prompt
     awful.key({ modkey }, "r", function ()
-        awful.util.spawn("dmenu_run -i -p 'Run command:' " .. dmenu_colors())
+        awful.spawn("dmenu_run -i -p 'Run command:' " .. dmenu_colors())
     end, {
         description = "run prompt",
         group = "dmenu"
     }),
 
     awful.key({ modkey }, "o", function ()
-        awful.util.spawn_with_shell([[wmctrl -l | dmenu -i -l 20 ]] .. dmenu_colors() .. [[ | sed -e 's/.*\(0x[^ ]\+\).*/\1/g' | xargs wmctrl -ia]])
+        awful.spawn.with_shell([[wmctrl -l | dmenu -i -l 20 ]] .. dmenu_colors() .. [[ | sed -e 's/.*\(0x[^ ]\+\).*/\1/g' | xargs wmctrl -ia]])
     end, {
         description = "go to window by name",
         group = "dmenu"
@@ -402,7 +406,7 @@ local globalkeys = awful.util.table.join(
             prompt       = "Run Lua code: ",
             textbox      = awful.screen.focused().mypromptbox.widget,
             exe_callback = awful.util.eval,
-            history_path = awful.util.get_cache_dir() .. "/history_eval"
+            history_path = gears.filesystem.get_cache_dir() .. "/history_eval"
         }
     end, {
         description = "lua execute prompt",
@@ -410,7 +414,7 @@ local globalkeys = awful.util.table.join(
     })
 )
 
-local clientkeys = awful.util.table.join(
+local clientkeys = gears.table.join(
     awful.key({ modkey }, "d", awful.placement.under_mouse, {
         description = "place under mouse",
         group = "client"
@@ -454,7 +458,7 @@ local clientkeys = awful.util.table.join(
 -- Be careful: we use keycodes to make it works on any keyboard layout.
 -- This should map on the top row of your keyboard, usually 1 to 9.
 for i = 1, #layout_pairs do
-    globalkeys = awful.util.table.join(globalkeys,
+    globalkeys = gears.table.join(globalkeys,
         -- view tag only
         awful.key({ modkey }, "#" .. i + 9,
                   function ()
@@ -495,7 +499,7 @@ for i = 1, #layout_pairs do
                   end))
 end
 
-local clientbuttons = awful.util.table.join(
+local clientbuttons = gears.table.join(
     awful.button({ }, 1, function (c) client.focus = c; c:raise() end),
     awful.button({ modkey }, 1, tabs.client_move),
     awful.button({ modkey }, 3, awful.mouse.client.resize)
@@ -518,8 +522,6 @@ awful.rules.rules = {
     { rule = { class = "MPlayer" },
       properties = { floating = true } },
     { rule = { class = "pinentry" },
-      properties = { floating = true } },
-    { rule = { class = "gimp" },
       properties = { floating = true } },
 
     { rule = { class = "Conky" },

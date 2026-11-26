@@ -1,6 +1,7 @@
 
 textbox = require "wibox.widget.textbox"
 awful = require "awful"
+gears = require "gears"
 naughty = require "naughty"
 
 local selfwatch_text
@@ -18,7 +19,7 @@ make_selfwatch_textbox = (timeout=60) ->
     awful.spawn.easy_async "selfwatch status", (stdout, stderr, reason, code) ->
       fn stdout
 
-  t = with timer(:timeout)
+  t = with gears.timer(:timeout)
     \connect_signal "timeout", ->
       check_running (running) ->
         if running

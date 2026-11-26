@@ -1,5 +1,6 @@
 local textbox = require("wibox.widget.textbox")
 local awful = require("awful")
+local gears = require("gears")
 local naughty = require("naughty")
 local selfwatch_text
 local make_selfwatch_textbox
@@ -25,7 +26,7 @@ make_selfwatch_textbox = function(timeout)
   end
   local t
   do
-    local _with_0 = timer({
+    local _with_0 = gears.timer({
       timeout = timeout
     })
     _with_0:connect_signal("timeout", function()
