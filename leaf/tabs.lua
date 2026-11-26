@@ -396,6 +396,37 @@ function tabs.group_mode(home, modkey)
     end
 end
 
+-- Spawned windows waiting to join a stack: pid -> client to stack onto.
+local pending_spawns = {}
+
+-- Run `cmd` and put its window at the front of the focused window's stack.
+function tabs.spawn_tab(cmd)
+    local home = client.focus
+    local pid = awful.spawn(cmd)
+    if not home or type(pid) ~= "number" then return end
+    pending_spawns[pid] = home
+    gears.timer.start_new(10, function()
+        if pending_spawns[pid] == home then
+            pending_spawns[pid] = nil
+        end
+        return false
+    end)
+end
+
+client.connect_signal("manage", function(c)
+    local home = c.pid and pending_spawns[c.pid]
+    if not home then return end
+    pending_spawns[c.pid] = nil
+    -- Run after the other manage handlers (rules, placement in rc.lua) so
+    -- they don't move the window after it joins; still before it's drawn.
+    gears.timer.delayed_call(function()
+        if home.valid and c.valid then
+            tabs.pull(home, c)
+            tabs.activate(c)
+        end
+    end)
+end)
+
 function tabs.client_keys(modkey)
     return gears.table.join(
         awful.key({ modkey }, "g", function(c) tabs.group_mode(c, modkey) end,
